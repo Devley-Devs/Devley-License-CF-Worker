@@ -29,7 +29,6 @@ export default {
           return new Response(JSON.stringify({'status': `Database Error`}), {status: 500});
         }
         const licenses = await Licenses.findOne({ _id: String(user_id) })
-        await ProductActivities.insertOne({ user_id: user_id, product_id: env.PRODUCT_ID, version: request_body.version, time: new Date(), ip: ip })
 				const db_data = licenses?.products[env.PRODUCT_ID]
         const embed_fields = [
 					{ name: "License IP", value: `> ${"`"}${ip}${"`"}`, inline: true },
@@ -51,6 +50,7 @@ export default {
 					})} catch (e) {}
 					return new Response(JSON.stringify({error :"License Key Not Found"}), {status: 404});
 				} else {
+          await ProductActivities.insertOne({ user_id: user_id, product_id: env.PRODUCT_ID, version: request_body.version, time: new Date(), ip: ip })
           embed = {...embed, fields: embed_fields, description: "### `✅` Successfully sent the License Key", timestamp: new Date().toISOString(), color: env.COLOR}
 					try {
 						await fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })
