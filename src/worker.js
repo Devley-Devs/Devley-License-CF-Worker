@@ -20,11 +20,11 @@ export default {
         }
         try {
           const app = new Realm.App({ id: env.REALM_ID });
-          const credentials = Realm.Credentials.apiKey(env.REALM_API);
-          var user = await app.logIn(credentials);
+          var user = await app.logIn(Realm.Credentials.apiKey(env.REALM_API));
           var client = user.mongoClient('mongodb-atlas');
           var Licenses = client.db('DevleyDB').collection('Licenses')
           var ProductActivities = client.db('DevleyDB').collection('ProductActivities')
+          var Products = client.db('DevleyDB').collection('Products')
         } catch(err) {
           return new Response(JSON.stringify({'status': `Database Error`}), {status: 500});
         }
@@ -37,31 +37,32 @@ export default {
 					{ name: "Transaction ID", value: `> ${transaction_id}`, inline: false },
 					{ name: "User", value: `> <@!${user_id}>`, inline: true },
 					{ name: "User ID", value: `> ${user_id}`, inline: true },
+					{ name: "Dashboard", value: `${env.DASHBOARD_URL}/admin/${user_id}/profile`, inline: false },
 					{ name: "License Key", value: `**${"```"}yaml\nLICENSE:\n    LICENSE_KEY: ${request_body.license_key}\n${"```"}**`, inline: false }
 				]
         let embed = { type: "rich",
           author: {name: `${env.PRODUCT_NAME}`, icon_url: env.PRODUCT_ICON},
           footer: {text: `${env.PRODUCT_NAME} License`, icon_url: env.PRODUCT_ICON},
         }
-				if ((db_data == null) || (db_data.transaction_id != transaction_id) || (db_data?.misc?.uuid != uuid)) {
-					embed = {...embed, fields: embed_fields, description: "### `❌` Invalid License Key Passed", timestamp: new Date().toISOString(), color: 16390168}
-					try {
-						await fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })
-					})} catch (e) {}
+				if ((db_data == null) || (db_data?.transaction_id != transaction_id) || (db_data?.misc?.uuid != uuid)) {
+					const invalidKey = { name: "Invalid License Key", value: `**${"```"}${request_body.license_key}${"```"}**`, inline: false }
+					embed = {...embed, fields: [...embed_fields.slice(0, 3), invalidKey], description: "### `❌` Invalid License Key Passed", timestamp: new Date().toISOString(), color: 16390168}
+          fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
 					return new Response(JSON.stringify({error :"License Key Not Found"}), {status: 404});
-				} else {
+				} else if (db_data?.blocked) {
+					embed = {...embed, fields: embed_fields, description: "### `⛔` Blocked License Key", timestamp: new Date().toISOString(), color: 16390168}
+          fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
+					return new Response(JSON.stringify({error :"License Key has been Blocked"}), {status: 402});
+        } else {
           await ProductActivities.insertOne({ user_id: user_id, product_id: env.PRODUCT_ID, version: request_body.version, time: new Date(), ip: ip })
           embed = {...embed, fields: embed_fields, description: "### `✅` Successfully sent the License Key", timestamp: new Date().toISOString(), color: env.COLOR}
-					try {
-						await fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })
-					})} catch (e) {}
-					return new Response(JSON.stringify({license_key: db_data.license_key}), {status: 200});
+          fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
+          const product = await Products.findOne({ _id: env.PRODUCT_ID })
+					return new Response(JSON.stringify({license_key: db_data.license_key, product: product}), {status: 200});
 				}
 			} else {
 				const embed = {...embed, description: `### ${"`"}⚠️${"`"} UnAuthorized Access to the Licence Server\n**IP :** ${"`"}${ip}${"`"}\n**Time :** <t:${parseInt(Date.now() / 1000)}>`, timestamp: new Date().toISOString(), color: 16763904}
-				try {
-					await fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })
-				})} catch (e) {}
+				fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
 				return new Response(JSON.stringify({error :"UnAuthorized Access"}), {status: 403});
 			}
 		} else if (request.method === "GET") {
