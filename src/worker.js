@@ -47,23 +47,31 @@ export default {
 				if ((db_data == null) || (db_data?.transaction_id != transaction_id) || (db_data?.misc?.uuid != uuid)) {
 					const invalidKey = { name: "Invalid License Key", value: `**${"```"}${request_body.license_key}${"```"}**`, inline: false }
 					embed = {...embed, fields: [...embed_fields.slice(0, 3), invalidKey], description: "### `❌` Invalid License Key Passed", timestamp: new Date().toISOString(), color: 16390168}
-          fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
-					return new Response(JSON.stringify({error :"License Key Not Found"}), {status: 404});
+          try {
+            await fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
+					} catch {}
+          return new Response(JSON.stringify({error :"License Key Not Found"}), {status: 404});
 				} else if (db_data?.blocked) {
 					embed = {...embed, fields: embed_fields, description: "### `⛔` Blocked License Key", timestamp: new Date().toISOString(), color: 16390168}
-          fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
+          try {
+            await fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
+					} catch {}
 					return new Response(JSON.stringify({error :"License Key has been Blocked"}), {status: 402});
         } else {
           await ProductActivities.insertOne({ user_id: user_id, product_id: env.PRODUCT_ID, version: request_body.version, time: new Date(), ip: ip })
           embed = {...embed, fields: embed_fields, description: "### `✅` Successfully sent the License Key", timestamp: new Date().toISOString(), color: env.COLOR}
-          fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
+          try {
+            await fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
+					} catch {}
           const product = await Products.findOne({ _id: env.PRODUCT_ID })
 					return new Response(JSON.stringify({license_key: db_data.license_key, product: product}), {status: 200});
 				}
 			} else {
 				const embed = {...embed, description: `### ${"`"}⚠️${"`"} UnAuthorized Access to the Licence Server\n**IP :** ${"`"}${ip}${"`"}\n**Time :** <t:${parseInt(Date.now() / 1000)}>`, timestamp: new Date().toISOString(), color: 16763904}
-				fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
-				return new Response(JSON.stringify({error :"UnAuthorized Access"}), {status: 403});
+        try {
+				  await fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
+        } catch {}
+        return new Response(JSON.stringify({error :"UnAuthorized Access"}), {status: 403});
 			}
 		} else if (request.method === "GET") {
 			return new Response(`${env.PRODUCT_NAME} Licensing System V${env.VERSION}`, {status: 302});
