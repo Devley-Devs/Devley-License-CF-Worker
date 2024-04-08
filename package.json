@@ -12,6 +12,7 @@
     "wrangler": "^3.0.0"
   },
   "dependencies": {
+    "bson": "^6.6.0",
     "realm-web": "^2.0.0"
   }
 }

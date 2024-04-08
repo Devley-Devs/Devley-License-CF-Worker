@@ -1,3 +1,4 @@
+import { ObjectId } from 'bson';
 import * as Realm from 'realm-web';
 
 export default {
@@ -52,18 +53,24 @@ export default {
 					} catch {}
           return new Response(JSON.stringify({error :"License Key Not Found"}), {status: 404});
 				} else if (db_data?.blocked) {
-					embed = {...embed, fields: embed_fields, description: "### `⛔` Blocked License Key", timestamp: new Date().toISOString(), color: 16390168}
-          try {
-            await fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
-					} catch {}
+          embed = {...embed, fields: embed_fields, description: "### `⛔` Blocked License Key", timestamp: new Date().toISOString(), color: 16390168}
+          if (String(env.OWNER_ID) != String(user_id)) {
+            await ProductActivities.insertOne({ user_id: user_id, product_id: env.PRODUCT_ID, version: request_body.version, time: new Date(), ip: ip, status: '⛔' })
+            try { await fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })}) }
+            catch {}
+          }
 					return new Response(JSON.stringify({error :"License Key has been Blocked"}), {status: 402});
         } else {
-          await ProductActivities.insertOne({ user_id: user_id, product_id: env.PRODUCT_ID, version: request_body.version, time: new Date(), ip: ip })
           embed = {...embed, fields: embed_fields, description: "### `✅` Successfully sent the License Key", timestamp: new Date().toISOString(), color: env.COLOR}
+          if (String(env.OWNER_ID) != String(user_id)) {
+            await ProductActivities.insertOne({ user_id: user_id, product_id: env.PRODUCT_ID, version: request_body.version, time: new Date(), ip: ip, status: '✅' })
+            try { await fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })}) }
+            catch {}
+          }
           try {
-            await fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
-					} catch {}
-          const product = await Products.findOne({ _id: env.PRODUCT_ID })
+            var product = await Products.findOne({ _id: new ObjectId(env.PRODUCT_ID) })
+            delete product.link
+          } catch { var product = {} }
 					return new Response(JSON.stringify({license_key: db_data.license_key, product: product}), {status: 200});
 				}
 			} else {
