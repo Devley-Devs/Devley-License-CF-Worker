@@ -95,6 +95,7 @@ export default {
       const webSocketPair = new WebSocketPair();
       const [ws_client, ws_server] = Object.values(webSocketPair);
       ws_server.accept();
+      ws_client.total_pings = 0
       ws_client.user_id = null
       ws_client.version = null
       ws_client.session_id = null
@@ -112,10 +113,16 @@ export default {
           ws_client.session_id = parsedLicense.session_id
           ws_client.machine_id = parsedLicense.machine_id
           const activeConnections = await OnlineLicenses.find({ user_id: ws_client.user_id }) || []
+          if ((ws_client.total_pings > 0) && (!activeConnections.map(d => d.session_id).includes(ws_client.session_id))) {
+            return ws_server.send(JSON.stringify({ 'event': 'killconn' }))
+          }
           for (let conn in activeConnections) {
-            if ((activeConnections[conn]?.terminate) || (new Date(activeConnections[conn].time.getTime() + ((env.WS_KEEPALIVE)*1000)) < new Date())) {
+            if (new Date(activeConnections[conn].time.getTime() + ((activeConnections[conn].keepalive)*1000)) < new Date()) {
               await OnlineLicenses.deleteOne({ session_id: activeConnections[conn].session_id })
               activeConnections.splice(conn, conn)
+            }
+            if (activeConnections[conn].session_id == ws_client.session_id) {
+              activeConnections.splice(conn, 1)
             }
           }
           if (activeConnections.length >= 1) {
@@ -126,6 +133,7 @@ export default {
             await OnlineLicenses.insertOne({ user_id: ws_client.user_id, product_id: env.PRODUCT_ID, version: ws_client.version, time: new Date(), ip: ip, keepalive: env.WS_KEEPALIVE, session_id: ws_client.session_id, machine_id: ws_client.machine_id })
           }
           ws_server.send(JSON.stringify({ 'event': 'keepalive', 'keepalive': env.WS_KEEPALIVE }))
+          ws_client.total_pings += 1
         }
       });
       ws_server.addEventListener('close', async (event) => {
