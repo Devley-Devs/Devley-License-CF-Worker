@@ -114,19 +114,13 @@ export default {
           ws_client.machine_id = parsedLicense.machine_id
           const activeConnections = await OnlineLicenses.find({ user_id: ws_client.user_id }) || []
           if ((ws_client.total_pings > 0) && (!activeConnections.map(d => d.session_id).includes(ws_client.session_id))) {
-            return ws_server.send(JSON.stringify({ 'event': 'killconn' }))
+            ws_server.send(JSON.stringify({ 'event': 'killconn' }))
+            return ws_server.close(1008, "Closing the Connection due to Multiple Connections")
           }
           for (let conn in activeConnections) {
-            if (new Date(activeConnections[conn].time.getTime() + ((activeConnections[conn].keepalive)*1000)) < new Date()) {
+            if (activeConnections[conn].session_id != ws_client.session_id) {
               await OnlineLicenses.deleteOne({ session_id: activeConnections[conn].session_id })
-              activeConnections.splice(conn, conn)
             }
-            if (activeConnections[conn].session_id == ws_client.session_id) {
-              activeConnections.splice(conn, 1)
-            }
-          }
-          if (activeConnections.length >= 1) {
-            return ws_server.send(JSON.stringify({ 'event': 'killconn' }))
           }
           const previousConnection = await OnlineLicenses.findOneAndUpdate({ session_id: ws_client.session_id }, { user_id: ws_client.user_id, product_id: env.PRODUCT_ID, version: ws_client.version, time: new Date(), ip: ip, keepalive: env.WS_KEEPALIVE, session_id: ws_client.session_id, machine_id: ws_client.machine_id })
           if (previousConnection == null) {
