@@ -112,7 +112,7 @@ export default {
           ws_client.version = parsedLicense.version
           ws_client.session_id = parsedLicense.session_id
           ws_client.machine_id = parsedLicense.machine_id
-          const activeConnections = await OnlineLicenses.find({ user_id: ws_client.user_id }) || []
+          const activeConnections = await OnlineLicenses.find({ user_id: ws_client.user_id, product_id: env.PRODUCT_ID }) || []
           if ((ws_client.total_pings > 0) && (!activeConnections.map(d => d.session_id).includes(ws_client.session_id))) {
             ws_server.send(JSON.stringify({ 'event': 'killconn' }))
             return ws_server.close(1008, "Closing the Connection due to Multiple Connections")
