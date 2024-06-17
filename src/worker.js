@@ -134,7 +134,7 @@ export default {
         if (ws_client.session_id) {
           await OnlineLicenses.deleteOne({ session_id: ws_client.session_id })
         }
-        return ws_server.close(1000, "Closing the License Websocket Connection")
+        ws_server.close(1000, "Closing the License Websocket Connection")
       });
       return new Response(null, {
         status: 101,
