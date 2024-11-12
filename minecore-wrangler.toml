@@ -1,0 +1,26 @@
+name = "minecore-license"
+main = "src/worker.js"
+compatibility_date = "2023-06-18"
+
+# [env.production]
+# MY_VARIABLE = "production_value"
+
+# [env.staging]
+# MY_VARIABLE = "staging_value"
+
+# [env.shared]
+# SHARED_VARIABLE = "shared_value"
+
+[vars]
+AUTHORIZATION_HEADER = "RGV2YWN0eWxARGV2YWN0eWxCb3Q="
+DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1124583179374833686/4MJ60U8RBEvodQvteR69C4sZ0yp2INmAzXDy60b-YDcTAqYdYZ5OS1hjoC2IDZ1iqp22"
+PRODUCT_ID = "656664030d230b4d33a529aa"
+PRODUCT_NAME = "MineCore Bot"
+PRODUCT_ICON = "https://github.com/Devley-Devs/MineCore/assets/64340067/457b295b-d984-43d9-9108-2d90770af3ea"
+OWNER_ID = "759050921413312532"
+REALM_API = "vvSJfWuschlpMGst7InfsQyocK3zKMr18pZHERXw7MkQ1e96xriw1Ewr9RBNHJwz"
+REALM_ID = "application-0-tuzpv"
+DASHBOARD_URL = "https://devley.yuvaraja.tech"
+WS_KEEPALIVE = "1800"
+VERSION = "1.3"
+COLOR = "2617536"
