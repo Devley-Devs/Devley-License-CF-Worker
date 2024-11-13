@@ -16,27 +16,33 @@ export async function LicenseWS(ip, env) {
   }
   ws_server.addEventListener('message', async (event) => {
     const ws_data = JSON.parse(event.data)
-    if (ws_data?.event === 'keepalive') {
+    if (ws_data?.event == 'keepalive') {
       const parsedLicense = parseLicenseResponse(ws_data)
       ws_client.user_id = parsedLicense.user_id
       ws_client.version = parsedLicense.version
       ws_client.session_id = parsedLicense.session_id
       ws_client.machine_id = parsedLicense.machine_id
       const previousConnection = await OnlineLicenses.findOne({ session_id: ws_client.session_id }) || {}
-      if ((ws_client.total_pings > 0) && ((previousConnection?.session_id != ws_client.session_id) || (previousConnection == null))) {
+      if ((ws_client.total_pings > 0) && (previousConnection?.session_id != ws_client.session_id)) {
         ws_server.send(JSON.stringify({ event: 'killconn' }))
+        if (ws_client.session_id != null) {
+          await OnlineLicenses.deleteOne({ session_id: ws_client.session_id })
+        }
+        console.log("Closing the Connection due to Multiple Connections")
         return ws_server.close(1008, "Closing the Connection due to Multiple Connections")
       }
-      await OnlineLicenses.updateOne({ session_id: ws_client.session_id }, { ...previousConnection, user_id: ws_client.user_id, product_id: env.PRODUCT_ID, version: ws_client.version, time: new Date(), ip: ip, keepalive: env.WS_KEEPALIVE, session_id: ws_client.session_id, machine_id: ws_client.machine_id }, { upsert: true })
-      ws_server.send(JSON.stringify({ event: 'keepalive', keepalive: env.WS_KEEPALIVE, guild_ids: previousConnection?.guild_ids || [] }))
+      console.log("Keepalive from Client", ws_client.session_id, ws_client.user_id, event.data)
+      await OnlineLicenses.updateOne({ session_id: ws_client.session_id }, { ...previousConnection, user_id: ws_client.user_id, product_id: env.PRODUCT_ID, version: ws_client.version, time: new Date(), ip: ip, session_id: ws_client.session_id }, { upsert: true })
+      ws_server.send(JSON.stringify({ event: 'keepalive', keepalive: (previousConnection?.keepalive == null) ? env.WS_KEEPALIVE : previousConnection?.keepalive, guild_ids: previousConnection?.guild_ids || [] }))
       ws_client.total_pings += 1
     }
   });
   ws_server.addEventListener('close', async (event) => {
-    if (ws_client.session_id) {
+    console.log("Closing the Connection", ws_client.session_id, ws_client.user_id)
+    if (ws_client.session_id != null) {
       await OnlineLicenses.deleteOne({ session_id: ws_client.session_id })
     }
-    ws_server.close(1000, "Closing the License Websocket Connection")
+    return ws_server.close(1000, "Closing the License Websocket Connection")
   });
   return { ws_client, ws_server, error: null }
 }
