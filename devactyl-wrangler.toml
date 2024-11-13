@@ -11,6 +11,11 @@ compatibility_date = "2023-06-18"
 # [env.shared]
 # SHARED_VARIABLE = "shared_value"
 
+# wrangler.toml (wrangler v3.79.0^)
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 [vars]
 AUTHORIZATION_HEADER = "TWluZUNvcmVATWluZUNvcmVCb3Q="
 DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1122225848762765342/K1rir3zwwPFHUhXt_tdPBUL_AupaG_V9oOMj5DKI0_3K9LhJFV6ebRS82tjWM-5-Auag"
