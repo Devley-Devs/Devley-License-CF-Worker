@@ -18,7 +18,7 @@ export default {
           status: 101,
           webSocket: ws_client,
         });
-      } else if (request.method === "GET") {
+      } else {
         return new Response(`${env.PRODUCT_NAME} Licensing System V${env.VERSION}`, {status: 302});
       }
     } catch (err) {
