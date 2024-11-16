@@ -33,7 +33,7 @@ export async function LicenseHTTP(request, ip, env) {
         await executeDiscordWebhook(parsedLicense, ip, "### `✅` Successfully sent the License Key", env.COLOR, env)
       }
       await OnlineLicenses.deleteMany({ user_id: parsedLicense.user_id, product_id: env.PRODUCT_ID })
-      await OnlineLicenses.insertOne({ user_id: parsedLicense.user_id, product_id: env.PRODUCT_ID, version: parsedLicense.version, time: new Date(), ip: ip, keepalive: env.WS_KEEPALIVE, session_id: parsedLicense.session_id, machine_id: parsedLicense.machine_id, guild_ids: db_data?.misc?.guild_ids || [] })
+      await OnlineLicenses.insertOne({ user_id: parsedLicense.user_id, product_id: env.PRODUCT_ID, version: parsedLicense.version, connectedTime: new Date(), time: new Date(), ip: ip, keepalive: env.WS_KEEPALIVE, session_id: parsedLicense.session_id, machine_id: parsedLicense.machine_id, guild_ids: db_data?.misc?.guild_ids || [] })
       var product = await Products.findOne({ _id: new ObjectId(env.PRODUCT_ID) }) || Object()
       delete product.link
       console.log("Sent the License Key", JSON.stringify(request_body))

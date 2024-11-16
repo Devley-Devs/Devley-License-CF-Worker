@@ -18,5 +18,7 @@ export async function executeDiscordWebhook(parsedLicense, ip, description, colo
   }
   try {
     await fetch(env.DISCORD_WEBHOOK, { method: 'POST', headers: {"Content-Type": 'application/json'}, body: JSON.stringify({ embeds: [embed] })})
-  } catch {}
+  } catch (error) {
+    console.log("Error sending Webhook log", error)
+  }
 }
