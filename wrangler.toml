@@ -1,5 +1,5 @@
-name = "devactyl-license"
-main = "src/worker.js"
+name = "devley"
+main = "src/worker.ts"
 compatibility_date = "2024-08-02"
 
 # [env.production]
@@ -11,18 +11,13 @@ compatibility_date = "2024-08-02"
 # [env.shared]
 # SHARED_VARIABLE = "shared_value"
 
-# wrangler.toml (wrangler v3.79.0^)
+# wrangler.toml (wrangler v4.15.0^)
 [observability]
 enabled = true
 head_sampling_rate = 1
 
 [vars]
-PRODUCT_ID = "656663b60d230b4d33a529a9"
-PRODUCT_NAME = "Devactyl Bot"
+VERSION = "1.6"
 OWNER_ID = "759050921413312532"
-REALM_API = "vvSJfWuschlpMGst7InfsQyocK3zKMr18pZHERXw7MkQ1e96xriw1Ewr9RBNHJwz"
-REALM_ID = "application-0-tuzpv"
 DASHBOARD_URL = "https://devley.1he.dev"
 WEBSOCKET_URL = "wss://devley_ws.1he.dev"
-WS_KEEPALIVE = "60"
-VERSION = "1.5"

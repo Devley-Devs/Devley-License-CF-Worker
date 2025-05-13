@@ -1,6 +1,6 @@
 {
   "name": "devley-license-worker",
-  "version": "1.4",
+  "version": "1.6",
   "private": true,
   "scripts": {
     "deploy": "wrangler deploy",
@@ -11,8 +11,5 @@
     "@cloudflare/workers-types": "^4.20241112.0",
     "typescript": "^5.6.3",
     "wrangler": "^4.15.0"
-  },
-  "dependencies": {
-    "realm-web": "^2.0.1"
   }
 }
