@@ -20,4 +20,4 @@ head_sampling_rate = 1
 VERSION = "1.6"
 OWNER_ID = "759050921413312532"
 DASHBOARD_URL = "https://devley.1he.dev"
-WEBSOCKET_URL = "wss://devley_ws.1he.dev"
+WEBSOCKET_URL = "wss://devley-ws.1he.dev"
