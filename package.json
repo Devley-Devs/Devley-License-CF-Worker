@@ -10,10 +10,9 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241112.0",
     "typescript": "^5.6.3",
-    "wrangler": "^3.87.0"
+    "wrangler": "^4.15.0"
   },
   "dependencies": {
-    "bson": "^6.9.0",
     "realm-web": "^2.0.1"
   }
 }

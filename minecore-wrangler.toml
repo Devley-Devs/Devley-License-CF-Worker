@@ -17,15 +17,12 @@ enabled = true
 head_sampling_rate = 1
 
 [vars]
-AUTHORIZATION_HEADER = "RGV2YWN0eWxARGV2YWN0eWxCb3Q="
-DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1124583179374833686/4MJ60U8RBEvodQvteR69C4sZ0yp2INmAzXDy60b-YDcTAqYdYZ5OS1hjoC2IDZ1iqp22"
 PRODUCT_ID = "656664030d230b4d33a529aa"
 PRODUCT_NAME = "MineCore Bot"
-PRODUCT_ICON = "https://github.com/Devley-Devs/MineCore/assets/64340067/457b295b-d984-43d9-9108-2d90770af3ea"
 OWNER_ID = "759050921413312532"
 REALM_API = "vvSJfWuschlpMGst7InfsQyocK3zKMr18pZHERXw7MkQ1e96xriw1Ewr9RBNHJwz"
 REALM_ID = "application-0-tuzpv"
-DASHBOARD_URL = "https://devley.yuvaraja.tech"
+DASHBOARD_URL = "https://devley.1he.dev"
+WEBSOCKET_URL = "wss://devley_ws.1he.dev"
 WS_KEEPALIVE = "60"
-VERSION = "1.4"
-COLOR = "2617536"
+VERSION = "1.5"
